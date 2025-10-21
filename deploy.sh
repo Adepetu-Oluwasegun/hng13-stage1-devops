@@ -117,6 +117,7 @@ server {
 }
 NGINX_CONF'
 
+
 sudo nginx -t && sudo systemctl reload nginx
 
 EOF
