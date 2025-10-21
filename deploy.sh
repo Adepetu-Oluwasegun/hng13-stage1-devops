@@ -121,10 +121,6 @@ sudo nginx -t
 sudo systemctl reload nginx
 EOF
 
-
-sudo nginx -t && sudo systemctl reload nginx
-
-EOF
 log " Nginx configured to forward traffic to Docker app."
 
 # === STEP 6: VALIDATION ===
@@ -133,7 +129,7 @@ ssh -i "$SSH_KEY" "$REMOTE_USER@$SERVER_IP" "curl -I http://localhost:$APP_PORT"
 curl -I "http://$DOMAIN" || error_exit "App not reachable via Nginx."
 log " Deployment successful! Access your app at: http://$DOMAIN"
 
-# === OPTIONAL CLEANUP FLAG ===
+# === CLEANUP FLAG ===
 if [ "${1:-}" = "--cleanup" ]; then
     log " Cleaning up deployment..."
     ssh -i "$SSH_KEY" "$REMOTE_USER@$SERVER_IP" <<EOF
