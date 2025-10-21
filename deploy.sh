@@ -101,8 +101,8 @@ log " Docker container deployed."
 
 # === STEP 5: CONFIGURE NGINX ===
 log " Configuring Nginx reverse proxy..."
-ssh -i "$SSH_KEY" "$REMOTE_USER@$SERVER_IP" <<EOF
-sudo bash -c 'cat > /etc/nginx/conf.d/myapp.conf <<NGINX_CONF
+ssh -i "$SSH_KEY" "$REMOTE_USER@$SERVER_IP" <<'EOF'
+sudo tee /etc/nginx/conf.d/myapp.conf > /dev/null <<NGINX_CONF
 server {
     listen 80;
     server_name _;
@@ -115,7 +115,11 @@ server {
         proxy_set_header X-Forwarded-Proto \$scheme;
     }
 }
-NGINX_CONF'
+NGINX_CONF
+
+sudo nginx -t
+sudo systemctl reload nginx
+EOF
 
 
 sudo nginx -t && sudo systemctl reload nginx
