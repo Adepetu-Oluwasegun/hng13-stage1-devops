@@ -41,7 +41,7 @@ read APP_PORT
 printf "Enter domain name (press Enter to use server IP): "
 read DOMAIN
 
-# If no domain entered, detect and use server IP
+# If no domain entered, allow  use of server IP
 if [ -z "$DOMAIN" ]; then
     log "No domain entered. Detecting server public IP..."
     DOMAIN=$(ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$REMOTE_USER@$SERVER_IP" "curl -s ifconfig.me || hostname -I | awk '{print \$1}'")
@@ -71,6 +71,7 @@ log " Repository ready."
 log "🔧 Preparing remote environment..."
 ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$REMOTE_USER@$SERVER_IP" <<EOF
 set -eu
+
 sudo yum update -y
 sudo yum install -y docker nginx
 sudo systemctl enable --now docker nginx
@@ -95,6 +96,7 @@ docker rmi myapp:latest 2>/dev/null || true
 # Build and run
 docker build -t myapp .
 docker run -d --name myapp -p $APP_PORT:$APP_PORT myapp
+
 EOF
 log " Docker container deployed."
 
@@ -117,6 +119,7 @@ server {
 CONFIG'
 
 sudo nginx -t && sudo systemctl reload nginx
+
 EOF
 log " Nginx configured to forward traffic to Docker app."
 
