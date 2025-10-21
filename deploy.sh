@@ -38,6 +38,11 @@ printf "Enter SSH key path: "
 read SSH_KEY
 [ ! -f "$SSH_KEY" ] && error_exit "SSH key not found at: $SSH_KEY"
 
+# Default non-interactive SSH/SCP options (defined early so they're always available)
+# -T disables pseudo-tty allocation; BatchMode prevents password prompts; ConnectTimeout keeps attempts short
+SSH_OPTS="-i $SSH_KEY -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=8 -o BatchMode=yes -T"
+SCP_OPTS="-i $SSH_KEY -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=8"
+
 printf "Enter application internal port (e.g. 80 or 8080): "
 read APP_PORT
 [ -z "$APP_PORT" ] && error_exit "App port cannot be empty."
