@@ -9,7 +9,7 @@ error_exit() { log " ERROR: $*"; exit 1; }
 
 trap 'error_exit "Script exited unexpectedly."' EXIT
 
-# === STEP 1: COLLECT PARAMETERS ===
+# === COLLECT PARAMETERS ===
 printf "Enter Git repository URL: "
 read GIT_REPO
 [ -z "$GIT_REPO" ] && error_exit "Repository URL cannot be empty."
@@ -51,7 +51,7 @@ else
     log "Using provided domain: $DOMAIN"
 fi
 
-# === STEP 2: CLONE OR UPDATE REPO LOCALLY ===
+# ===  CLONE OR UPDATE REPO LOCALLY ===
 REPO_DIR=$(basename "$GIT_REPO" .git)
 
 if [ -d "$REPO_DIR" ]; then
@@ -67,7 +67,7 @@ fi
 [ ! -f "dockerfile" ] && error_exit "dockerfile not found in repository."
 log " Repository ready."
 
-# === STEP 3: PREPARE REMOTE SERVER ===
+# === PREPARE REMOTE SERVER ===
 log " Preparing remote environment..."
 ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$REMOTE_USER@$SERVER_IP" <<EOF
 set -eu
@@ -78,7 +78,7 @@ sudo usermod -aG docker $REMOTE_USER || true
 EOF
 log " Remote server setup complete."
 
-# === STEP 4: DEPLOY APPLICATION ===
+# === DEPLOY APPLICATION ===
 log " Deploying Dockerized app to remote server..."
 ssh -i "$SSH_KEY" "$REMOTE_USER@$SERVER_IP" "mkdir -p /home/$REMOTE_USER/app"
 scp -i "$SSH_KEY" -r app.py requirements.txt dockerfile docker-compose.yml "$REMOTE_USER@$SERVER_IP:/home/$REMOTE_USER/app/"
@@ -99,7 +99,7 @@ docker run -d --name myapp -p $APP_PORT:$APP_PORT myapp
 EOF
 log " Docker container deployed."
 
-# === STEP 5: CONFIGURE NGINX ===
+# === CONFIGURE NGINX ===
 log " Configuring Nginx reverse proxy..."
 ssh -i "$SSH_KEY" "$REMOTE_USER@$SERVER_IP" <<'EOF'
 sudo tee /etc/nginx/conf.d/myapp.conf > /dev/null <<NGINX_CONF
@@ -123,7 +123,7 @@ EOF
 
 log " Nginx configured to forward traffic to Docker app."
 
-# === STEP 6: VALIDATION ===
+# === VALIDATION ===
 log " Validating deployment..."
 ssh -i "$SSH_KEY" "$REMOTE_USER@$SERVER_IP" "curl -I http://localhost:$APP_PORT" || error_exit "App not responding internally."
 curl -I "http://$DOMAIN" || error_exit "App not reachable via Nginx."
