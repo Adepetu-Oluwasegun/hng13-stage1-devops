@@ -34,7 +34,7 @@ printf "Enter SSH key path: "
 read SSH_KEY
 [ ! -f "$SSH_KEY" ] && error_exit "SSH key not found at: $SSH_KEY"
 
-printf "Enter application internal port (e.g. 80 or 8080): "
+printf "Enter application internal port (e.g. 5000 or 8080): "
 read APP_PORT
 [ -z "$APP_PORT" ] && error_exit "App port cannot be empty."
 
